@@ -1,0 +1,3361 @@
+openapi: 3.0.1
+info:
+  title: LinXmart API
+  description: >-
+    The API provides a set of resources for configuring and running
+    LinXmart.<br/>
+  contact:
+    name: LinXmart Support
+    email: support@linxmart.com.au
+  version: '3.3'
+paths:
+  /api/v{version}/dataproviders:
+    get:
+      tags:
+        - DataProviders
+      summary: Get all data providers
+      description: All data providers in the system will be returned.
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataProvider'
+    post:
+      tags:
+        - DataProviders
+      summary: Create a data provider
+      description: A new data provider is created using the data passed in.
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The DataProvider object to save.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataProvider'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataProvider'
+  /api/v{version}/dataproviders/{id}:
+    get:
+      tags:
+        - DataProviders
+      summary: Get a data provider
+      description: >-
+        A single data provider will be returned, based on the `id` value passed
+        in.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific data provider to return.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataProvider'
+    put:
+      tags:
+        - DataProviders
+      summary: Update a data provider
+      description: >-
+        Updates an existing data provider using the details passed in the body
+        of the request.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the data provider to update.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: A DataProvider object containing the updated information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataProvider'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - DataProviders
+      summary: Delete a data provider
+      description: >-
+        The data provider is marked for deletion and jobs are initiated to
+        end-date all associated event data.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the data provider to delete.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Data Provider resource can not be found.
+  /api/v{version}/dataproviders/{id}/eventtypes:
+    get:
+      tags:
+        - DataProviders
+      summary: Gets event types for a data provider
+      description: All event types for the specificed data provider are returned.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific data provider to return event types for.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+  /api/v{version}/envelopes:
+    get:
+      tags:
+        - Envelopes
+      summary: Get all envelopes
+      description: >-
+        Returns a list of envelope objects for linkage projects that the user
+        has permissions to access.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Envelope'
+        '401':
+          description: User does not have required permissions.
+    post:
+      tags:
+        - Envelopes
+      summary: Upload an envelope
+      description: "Submits a new envelope to the system by loading it into the Inbox. The envelope is not checked\r\nat this point for validity; it is simply loaded into the Inbox to be processed at a later time.\r\nThe request body should contain the envelope zip file using the content type\r\n“multipart/form-data” – this is a standard HTTP form file upload. Please ensure you specify the\r\nfilename as this is used to identify the envelope."
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Envelope uploaded successfully.
+        '400':
+          description: Something went wrong.
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/envelopes/{name}:
+    get:
+      tags:
+        - Envelopes
+      summary: Get an envelope
+      description: "Returns a specific envelope object based on the envelope's name. The envelope must exist and the user must have permissions to view it.\r\n\r\nPossible status values:\r\n* 0 = Unknown\r\n* 1 = Pending\r\n* 2 = Processing\r\n* 3 = Failed\r\n* 4 = Complete\r\n\r\nPossible type values:\r\n* 0 - Unknown\r\n* 1 - Linkage\r\n* 2 - Extraction\r\n* 3 - Deletion\r\n* 4 - ProbsCalculation\r\n* 5 - QualityReview"
+      parameters:
+        - name: name
+          in: path
+          description: The name of the envelope to retrieve.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Envelope resource can not be found.
+  /api/v{version}/envelopes/{name}/extractions:
+    get:
+      tags:
+        - Envelopes
+      summary: Get extraction requests for an envelope
+      description: "Used to return Extraction objects that may be associated with an envelope. The envelope would\r\n            need to be a request for extraction and the user requires permission to view it."
+      parameters:
+        - name: name
+          in: path
+          description: The name of the envelope to get extractions for.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Extraction'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Envelope resource can not be found.
+  /api/v{version}/envelopes/{name}/notifications:
+    get:
+      tags:
+        - Envelopes
+      summary: Get notifications for an envelope
+      description: >-
+        Used to return Extraction objects that may be associated with an
+        envelope.
+      parameters:
+        - name: name
+          in: path
+          description: The name of the envelope to get notifications.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Envelope resource can not be found.
+  /api/v{version}/envelopes/{name}/jobs:
+    get:
+      tags:
+        - Envelopes
+      summary: Get jobs for an envelope
+      description: Used to return Job objects that may be associated with an envelope.
+      parameters:
+        - name: name
+          in: path
+          description: The name of the envelope to get jobs.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Envelope resource can not be found.
+  /api/v{version}/eventtypes:
+    get:
+      tags:
+        - EventTypes
+      summary: Get all event types
+      description: All event types in the system will be returned.
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+        '401':
+          description: User does not have required permissions.
+    post:
+      tags:
+        - EventTypes
+      summary: Create an event type
+      description: "A new event type is created using the data passed in, assuming the parent data provider\r\n            referenced is valid."
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The EventType object to save.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventType'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Event type created successfully.
+        '400':
+          description: Unable to create event type.
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/eventtypes/{id}:
+    get:
+      tags:
+        - EventTypes
+      summary: Get an event type
+      description: A single event type will be returned, based on the `id` value passed in.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific event type to return.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Event type resource can not be found.
+    put:
+      tags:
+        - EventTypes
+      summary: Update an event type
+      description: >-
+        Updates an existing event type using the details passed in the body of
+        the request.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the event type to update.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: An EventType object containing the updated information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventType'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Event type updated successfully.
+        '400':
+          description: Could not parse the request body.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Event type resource can not be found.
+    delete:
+      tags:
+        - EventTypes
+      summary: Request deletion of an event type
+      description: >-
+        The event type is marked for deletion and a job is initiated to end-date
+        all associated event data.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the event type to delete.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+        '202':
+          description: Event type marked for deletion successfully.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Event type resource can not be found.
+  /api/v{version}/extractionprojects:
+    get:
+      tags:
+        - ExtractionProjects
+      summary: Get all extraction projects
+      description: "Returns a list of extraction project objects for linkage projects that the user has\r\n            permissions to access."
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtractionProject'
+        '401':
+          description: User does not have required permissions.
+    post:
+      tags:
+        - ExtractionProjects
+      summary: Create an extraction project
+      description: "Creates a new extraction project for a a specific linkage project. The linkage project ID must\r\n            be specified in the request object."
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The ExtractionProject object to save.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractionProject'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionProject'
+        '201':
+          description: Extraction project created successfully.
+        '401':
+          description: User does not have required permissions.
+        '409':
+          description: Extraction project code already used.
+  /api/v{version}/extractionprojects/{id}:
+    get:
+      tags:
+        - ExtractionProjects
+      summary: Get an extraction project
+      description: "Returns a single extraction project object based on the unique code assigned to it.\r\n            The user must have permissions to view the extraction project."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific extraction project to return.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionProject'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Extraction project resource can not be found.
+  /api/v{version}/extractionprojects/{id}/extractions:
+    get:
+      tags:
+        - ExtractionProjects
+      summary: Get extraction requests for an extraction project
+      description: "Returns a list of all extractions associated with the extraction project with the\r\n            specified `id`."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Extraction'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Extraction project resource can not be found.
+  /api/v{version}/extractions:
+    get:
+      tags:
+        - Extractions
+      summary: Gets all extraction requests
+      description: "Returns a list of extraction requests for linkage projects that the user has\r\n            permissions to access."
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Extraction'
+        '401':
+          description: User does not have required permissions.
+    post:
+      tags:
+        - Extractions
+      summary: Create an extraction request
+      description: "This will request an extraction for a specific event type and return immediately. The extraction\r\n            is executed as a job when available. All records of the specified event type will participate in\r\n            the extraction."
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Extraction'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '201':
+          description: Extraction created successfully.
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/extractions/{id}:
+    get:
+      tags:
+        - Extractions
+      summary: Get an extraction request
+      description: "Returns a single extraction request for the `id` specified, assuming the user has\r\npermissions to access it.\r\n\r\nPossible status values:\r\n* 0 = Unknown\r\n* 1 = Pending\r\n* 2 = Processing\r\n* 3 = Failed\r\n* 4 = Complete"
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific extraction request.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Result resource can not be found.
+  /api/v{version}/extractions/{id}/results:
+    get:
+      tags:
+        - Extractions
+      summary: Get results for an extraction request
+      description: Returns all result resources for the extraction request id specified.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Result'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Result resource can not be found.
+  /api/v{version}/importformats:
+    get:
+      tags:
+        - ImportFormats
+      summary: Get all import formats
+      description: Returns a list of all import format objects in the system.
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImportFormat'
+        '401':
+          description: User does not have required permissions.
+    post:
+      tags:
+        - ImportFormats
+      summary: Create an import format
+      description: Creates a new import format and saves it in the system.
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The ImportFormat object to save.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportFormat'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportFormat'
+        '201':
+          description: Import format created successfully.
+        '401':
+          description: User does not have required permissions.
+        '409':
+          description: Import format code already used.
+  /api/v{version}/importformats/{id}:
+    get:
+      tags:
+        - ImportFormats
+      summary: Get an import format
+      description: "Returns a single import format object based on the unique code assigned to it.\r\nThe user must have permissions to view the import format.\r\n\r\nPossible column type values:\r\n* 0 = Unknown\r\n* 1 = FixedWidth\r\n* 2 = DelimitedByIndex\r\n* 3 = DelimitedByName"
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific import format to return.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportFormat'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Import format resource can not be found.
+    put:
+      tags:
+        - ImportFormats
+      summary: Update an import format
+      description: >-
+        Updates an existing import format using the details passed in the body
+        of the request.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the import format to update.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: A ImportFormat object containing the updated information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportFormat'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Import format updated successfully.
+        '400':
+          description: Could not parse the request body.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Import format resource can not be found.
+    delete:
+      tags:
+        - ImportFormats
+      summary: Delete an import format
+      description: >-
+        An import format cannot be deleted if it is being used by an active
+        event type.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the data propvider to delete.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Import format deleted successfully.
+        '400':
+          description: Unable to delete import format
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Import format resource can not be found.
+  /api/v{version}/jobs:
+    get:
+      tags:
+        - Jobs
+      summary: Get all jobs
+      description: >-
+        Returns a list of jobs for linkage projects that the user has
+        permissions to access.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/jobs/{id}:
+    get:
+      tags:
+        - Jobs
+      summary: Get a job
+      description: Returns a job using its internal identifier.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the job.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Job resource can not be found.
+  /api/v{version}/linkages:
+    get:
+      tags:
+        - Linkages
+      summary: Get all linkage requests
+      description: >-
+        Returns a list of linkage requests for linkage projects that the user
+        has permissions to access.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Linkage'
+        '401':
+          description: User does not have required permissions.
+    post:
+      tags:
+        - Linkages
+      summary: Create a linkage request
+      description: "This will request a linkage for a specific data source and return immediately. The linkage\r\n            is executed by the system in the background."
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Linkage'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Linkage'
+        '201':
+          description: Linkage created successfully.
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/linkages/{id}:
+    get:
+      tags:
+        - Linkages
+      summary: Get a linkage request
+      description: "Returns a specific linkage object based on the linkage request `id`.\r\nThe linkage request must exist and the user must have permissions to view it.\r\n\r\nPossible status values:\r\n* 0 = Pending\r\n* 1 = Processing\r\n* 2 = Failed\r\n* 3 = Complete"
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the linkage request.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Linkage'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Linkage resource can not be found.
+  /api/v{version}/linkages/bulkload:
+    post:
+      tags:
+        - Linkages
+      summary: Create a bulk linkage and extraction workflow
+      description: "This will request a workflow to bulk load multiple data sources and return immediately. The workflow\r\n            is processed by the system in the background."
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkLinkage'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '201':
+          description: Linkage workflow created successfully.
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/matchproviders:
+    get:
+      tags:
+        - MatchProviders
+      summary: Get all match providers
+      description: Returns a list of match provider objects in the system.
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchProvider'
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/matchproviders/{providerName}:
+    get:
+      tags:
+        - MatchProviders
+      summary: Get a match provider
+      description: Returns a single match provider object based on the provider name.
+      parameters:
+        - name: providerName
+          in: path
+          description: The name of the match provider to return.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchProvider'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Match provider resource can not be found.
+  /api/v{version}/matchproviders/{providerName}/fields:
+    get:
+      tags:
+        - MatchProviders
+      summary: Get fields supported by a match provider
+      description: Returns all fields supported by the named provider.
+      parameters:
+        - name: providerName
+          in: path
+          description: The name of the specific match provider.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchProviderField'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Match provider resource can not be found.
+  /api/v{version}/matchproviders/{providerName}/comparisontypes:
+    get:
+      tags:
+        - MatchProviders
+      summary: Get comparison types supported by a match provider
+      description: Returns all comparison types supported by the named provider.
+      parameters:
+        - name: providerName
+          in: path
+          description: The name of the specific match provider.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FieldComparisonType'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Match provider resource can not be found.
+  /api/v{version}/notifications/{id}:
+    get:
+      tags:
+        - Notifications
+      summary: Get a notification
+      description: Returns a notification using its internal identifier.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the notification.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Notification resource can not be found.
+  /api/v{version}/notifications/{id}/download:
+    get:
+      tags:
+        - Notifications
+      summary: Download attachment of notification
+      description: "Some notifications have associated attachments. If a notification does have an attachment, this call\r\n            will download that attachment."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific notification to download the attachment.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Notification resource or attachment can not be found.
+  /api/v{version}/projects:
+    get:
+      tags:
+        - Projects
+      summary: Get all linkage projects
+      description: >-
+        All linkage projects in the system that the user has permissions to
+        access will be returned.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+        '401':
+          description: User does not have required permissions.
+    post:
+      tags:
+        - Projects
+      summary: Create a linkage project
+      description: "A new linkage project is created using the data passed in. Default match strategies and linkage fields\r\n            will be created - if these require changing, separate calls to update/remove these will be required."
+      parameters:
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The Project object to save.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '201':
+          description: Linkage project created successfully.
+        '400':
+          description: Unable to create the linkage project.
+        '401':
+          description: User does not have required permissions.
+        '409':
+          description: Linkage project code is already used.
+  /api/v{version}/projects/{id}:
+    get:
+      tags:
+        - Projects
+      summary: Get a linkage project
+      description: "A single linkage project will be returned, based on the `id` value passed in. By setting the\r\n            `byCode` parameter you can specify whether the system should find the project based on either an ID\r\n            or a Code. If this parameter is not specified, the system will attempt to parse the value as an Integer - if\r\n            successful, it will find the project by ID, otherwise it will find it by Code."
+      parameters:
+        - name: id
+          in: path
+          description: The ID or code of the specific project to return.
+          required: true
+          schema:
+            type: string
+        - name: byCode
+          in: query
+          description: An optional flag forcing the system to find the project by its code.
+          schema:
+            type: boolean
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+    put:
+      tags:
+        - Projects
+      summary: Update a linkage project
+      description: >-
+        Updates an existing project using the details passed in the body of the
+        request.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the project to update.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: A Project object containing the updated information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Project updated successfully.
+        '400':
+          description: Could not parse the request body.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+    delete:
+      tags:
+        - Projects
+      summary: Delete a linkage project
+      description: "The linkage project is deleted from the system. The physical database back-end remains and must\r\n            be removed or archived separately (and manually)."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the project to delete.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Project deleted successfully.
+        '400':
+          description: Unable to delete project. Verify project is inactive.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/envelopes:
+    get:
+      tags:
+        - Projects
+      summary: Get envelopes for a linkage project
+      description: >-
+        All envelopes that are associated with the specified linkage project
+        will be returned.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific project to return envelopes for.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Envelope'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/projectdefinitionfile/{eventTypeCode}:
+    get:
+      tags:
+        - Projects
+      summary: Download project definition file for a linkage project
+      description: "The project definition file is used by the Envelope Builder to convert a raw data file into an envelope\r\nthat can recognised and loaded by the system. A separate project definition file is required for each event type."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the project to download the definition file.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: eventTypeCode
+          in: path
+          description: The CODE of the event type to download the definition file.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/extractionprojects:
+    get:
+      tags:
+        - Projects
+      summary: Get extraction projects for a linkage project
+      description: >-
+        All extraction projects created for the linkage project will be
+        returned.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific project to return extraction projects for.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtractionProject'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/matchconfig:
+    get:
+      tags:
+        - Projects
+      summary: Get match configuration for a linkage project
+      description: "Returns the match configuration for a specific project. Note that when a project is created, a default match\r\n            configuration is created."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the project to return the match configuration.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchConfig'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/matchconfig/weightcurves:
+    get:
+      tags:
+        - Projects
+      summary: Get weight curves for a linkage project
+      description: "Weight curves are used to map partial agreements from match comparisons to a proportion of weight.\r\n            Weight curves are referenced by matching fields within a strategy."
+      parameters:
+        - name: id
+          in: path
+          description: >-
+            The ID of the specific project to return the match configuration
+            weight curves.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeightCurve'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+    post:
+      tags:
+        - Projects
+      summary: Add weight curve to linkage project
+      description: Creates a new weight curve for use within the project.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific project to add the weight curve to.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The WeightCurve object containing the information to add.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightCurve'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Weight curve created successfully.
+        '400':
+          description: Unable to create the weight curve.
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/projects/{id}/matchconfig/weightcurves/{weightCurveId}:
+    get:
+      tags:
+        - Projects
+      summary: Get a weight curve for a linkage project
+      description: Returns a single weight curve using the internal id.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific project to return the weight curve.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: weightCurveId
+          in: path
+          description: The ID of the weight curve to return.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightCurve'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/matchconfig/weightcurves/{weightcurveId}:
+    put:
+      tags:
+        - Projects
+      summary: Update weight curve for a linkage project
+      parameters:
+        - name: id
+          in: path
+          description: The ID of a specific Project containing the weight curve.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: weightCurveId
+          in: path
+          description: The ID of the Weight Curve to modify.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: A WeightCurve object containing the updated information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeightCurve'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Project updated successfully.
+        '400':
+          description: Could not parse the request body.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+    delete:
+      tags:
+        - Projects
+      summary: Delete a weight curve from a linkage project
+      description: The weight curve is deleted from the project and the system.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the Project to remove the weight curve from.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: weightCurveId
+          in: path
+          description: The ID of the WeightCurve to remove.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Weight curve deleted successfully.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/matchconfig/strategies:
+    get:
+      tags:
+        - Projects
+      summary: Get match strategies in a linkage project
+      description: >-
+        All match configuration strategies for the linkage project will be
+        returned.
+      parameters:
+        - name: id
+          in: path
+          description: >-
+            The ID of the specific project to return the match configuration
+            strategies.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchStrategy'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+    post:
+      tags:
+        - Projects
+      summary: Add a match strategy for a linkage project
+      description: "A new match strategy is created with the details passed in. The order parameter of the strategy\r\nwill determine the order in which it is executed during matching. The smallest order is executed first."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the linkage project.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The MatchStrategy object containing the details to add.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchStrategy'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Match strategy created successfully.
+        '400':
+          description: Unable to create the match strategy.
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/projects/{id}/matchconfig/strategies/{strategyId}:
+    get:
+      tags:
+        - Projects
+      summary: Get a match strategy for a linkage project
+      description: >-
+        If the project and strategy IDs are valid, the match configuration
+        strategy is returned.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the linkage project.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: strategyId
+          in: path
+          description: >-
+            The ID of the specific match strategy to return the match
+            configuration strategy.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchStrategy'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+    put:
+      tags:
+        - Projects
+      summary: Update a match strategy for a linkage project
+      description: >-
+        An existing match strategy within a linkage project is updated with a
+        new set of details.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the linkage project.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: strategyId
+          in: path
+          description: The ID of the strategy to update.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      requestBody:
+        description: The MatchStrategy object containing the new details.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchStrategy'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Match strategy updated successfully.
+        '400':
+          description: Could not parse the request body.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+    delete:
+      tags:
+        - Projects
+      summary: Delete a match strategy from a linkage project
+      description: The match strategy is deleted from the project and the system.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the linkage project.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: strategyId
+          in: path
+          description: The ID of the strategy to delete.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Match strategy deleted successfully.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/projects/{id}/linkagefields:
+    get:
+      tags:
+        - Projects
+      summary: Get linkage fields for a linkage project
+      description: All linkage fields associated with the linkage project will be returned.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of a project to return the available linkage fields.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LinkageField'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Project resource can not be found.
+  /api/v{version}/results:
+    get:
+      tags:
+        - Results
+      summary: Get all extraction results
+      description: >-
+        Returns a list of result objects for linkage projects that the user has
+        permissions to access.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Result'
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/results/{id}:
+    get:
+      tags:
+        - Results
+      summary: Get an extraction result
+      description: "Returns a specific Result object based on the extraction result `id`.\r\n            The extraction result must exist and the user must have permissions to view it."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific extraction result to return.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Result resource can not be found.
+    delete:
+      tags:
+        - Results
+      summary: Delete an extraction result
+      description: Deletes an extraction result envelope by result `id` if file exists.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific extraction result file to delete.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: Result envelope file deleted successfully.
+        '304':
+          description: Result exists, but the file has already been deleted.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Results resource can not be found.
+  /api/v{version}/results/{id}/download:
+    get:
+      tags:
+        - Results
+      summary: Download data for an extraction result
+      description: "Downloads the envelope created containing the extraction results. It returns a binary file\r\n(application/octect-stream) which is a zip file containing the data that was requested in the\r\noriginal extraction."
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the specific extraction result to download.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: Result envelope downloaded successfully.
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: The result or the result's data file cannot be found.
+  /api/v{version}/workflows:
+    get:
+      tags:
+        - Workflow
+      summary: Get all workflows
+      description: >-
+        Returns a list of workflows for linkage projects that the user has
+        permissions to access.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: The number of items from the beginning to start returning from.
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workflow'
+        '401':
+          description: User does not have required permissions.
+  /api/v{version}/workflows/{id}:
+    get:
+      tags:
+        - Workflow
+      summary: Get a workflow
+      description: "Returns a single workflow object that includes its current status.\r\n\r\nPossible status values:\r\n* 0 = Unknown\r\n* 1 = Created\r\n* 2 = Queued\r\n* 3 = Processing\r\n* 4 = Complete\r\n* 5 = Failed\r\n* 6 = Cancelled"
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the workflow.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: version
+          in: path
+          description: The requested API version
+          required: true
+          schema:
+            type: string
+            default: '3.3'
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          description: User does not have required permissions.
+        '404':
+          description: Linkage resource can not be found.
+components:
+  schemas:
+    BlockingField:
+      required:
+        - matchProviderFieldName
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The system generated identifier of the blocking field
+          format: int32
+        matchProviderFieldName:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The name of the field as defined by the match provider
+        matchEmpty:
+          type: boolean
+          description: Flag indicates if empty/missing values should be used to form blocks
+      additionalProperties: false
+      description: A field used to form part of a blocking strategy
+    BulkLinkage:
+      required:
+        - envelopes
+        - name
+        - projectCode
+      type: object
+      properties:
+        projectCode:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: The code of the project that this linkage is a part of
+        name:
+          maxLength: 256
+          minLength: 1
+          type: string
+          description: A name to give this bulk linkage workflow
+        envelopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/BulkLinkageEnvelope'
+          description: A list of envelopes that will be included in the workflow
+        extractionProjectId:
+          type: string
+          description: >-
+            The ID of an enduring extraction project that will be used to
+            extract data from all linkage sources on completion of the linkage
+          nullable: true
+      additionalProperties: false
+    BulkLinkageEnvelope:
+      required:
+        - linkageSources
+      type: object
+      properties:
+        linkageSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkageSource'
+          description: >-
+            A list of sources that are combined into a single envelope for
+            linking
+      additionalProperties: false
+    ColumnType:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+      type: integer
+      format: int32
+    DataProvider:
+      required:
+        - code
+        - contactName
+        - email
+        - organisation
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: integer
+          description: The system defined identifier for the data provider
+          format: int32
+        code:
+          maxLength: 15
+          minLength: 1
+          type: string
+          description: >-
+            A reference code that can uniquely identify the data provider in the
+            system
+        organisation:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: The name of the provider organisation
+        contactName:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: The full name of the a contact for the organisation
+        email:
+          maxLength: 320
+          minLength: 1
+          type: string
+          description: The contact's email address for communication
+        phone:
+          maxLength: 20
+          type: string
+          description: The contact's phone number for communication
+          nullable: true
+      additionalProperties: false
+      description: >-
+        Represents an entity that might provide linkage data to the system:
+        their contact details and registered Event Types.
+    DataSource:
+      required:
+        - dataSourceType
+        - importFormatId
+        - name
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: integer
+          description: The system generated identifier of a data source
+          format: int32
+        code:
+          maxLength: 15
+          type: string
+          description: The user assigned code of the data source
+          nullable: true
+        name:
+          maxLength: 200
+          minLength: 1
+          type: string
+          description: The user assigned name of the data source
+        importFormatId:
+          type: integer
+          description: >-
+            The id of the import format that describes the columnar format of
+            the data
+          format: int32
+        dataSourceType:
+          maxLength: 32
+          minLength: 1
+          type: string
+          description: The name of the type of this data source
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSourceSetting'
+          description: A list of settings applicable to this particular type of data source
+          nullable: true
+      additionalProperties: false
+      description: >-
+        A data source represents a way of describing how data is ingested by the
+        system.
+    DataSourceSetting:
+      required:
+        - name
+        - value
+      type: object
+      properties:
+        name:
+          maxLength: 200
+          minLength: 1
+          type: string
+          description: The name of the setting
+        dataType:
+          maxLength: 200
+          type: string
+          description: The underlying type of the setting value
+          nullable: true
+        value:
+          maxLength: 4000
+          minLength: 1
+          type: string
+          description: The value of the setting
+        isSecret:
+          type: boolean
+          description: A flag indicating if the setting value should be treated as a secret
+      additionalProperties: false
+      description: "Represents a single setting property for a data source. These settings are specific\r\nto each data source type."
+    Envelope:
+      type: object
+      properties:
+        name:
+          type: string
+          description: >-
+            A name identifying the envelope - this is more of an ID to identify
+            the envelope
+          nullable: true
+        displayName:
+          type: string
+          description: "A name identifying the envelope - this may be the filename specified on upload or a name given on triggering a datasource\r\nthe extension"
+          nullable: true
+        createdDate:
+          type: string
+          description: "The date and time the envelope was added to the system. If the status is still Pending\r\nthis will be null"
+          format: date-time
+          nullable: true
+        status:
+          $ref: '#/components/schemas/EnvelopeStatus'
+        statusName:
+          type: string
+          description: Name of the current status of the envelope in the system
+          nullable: true
+        type:
+          $ref: '#/components/schemas/EnvelopeType'
+        typeName:
+          type: string
+          description: Name of the type of the envelope
+          nullable: true
+      additionalProperties: false
+      description: "An envelope represents a group of data files together with a manifest that describes the\r\ntype of data and what it is intended for. \r\nEnvelopes are uploaded as a binary file, but after that are represented as resources."
+    EnvelopeStatus:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+      type: integer
+      format: int32
+    EnvelopeType:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+      type: integer
+      format: int32
+    EventType:
+      required:
+        - category
+        - code
+        - description
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: integer
+          description: The system generated identifier of an event type
+          format: int32
+        dataProviderId:
+          type: integer
+          description: The id of the parent data provider
+          format: int32
+        code:
+          maxLength: 15
+          minLength: 1
+          type: string
+          description: The code of an event type
+        description:
+          maxLength: 4000
+          minLength: 1
+          type: string
+          description: A short description of the event type
+        isAuthoritative:
+          type: boolean
+          description: Flag indicating if each record represents a separate individual
+        category:
+          maxLength: 40
+          minLength: 1
+          type: string
+          description: An arbitrary categorisation
+        dataSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSource'
+          description: A list of the data sources associated with this event type
+          nullable: true
+      additionalProperties: false
+      description: An classification of a dataset type within the system.
+    EventTypeMember:
+      required:
+        - code
+      type: object
+      properties:
+        eventTypeId:
+          type: integer
+          description: The system generated identifier of an event type
+          format: int32
+        code:
+          maxLength: 15
+          minLength: 1
+          type: string
+          description: The code of an event type
+      additionalProperties: false
+      description: A reference to an event type in the system.
+    Extraction:
+      required:
+        - eventTypeCode
+        - extractionProjectId
+        - projectCode
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The primary identifier of the extraction generated by the system
+          format: int32
+        extractionProjectId:
+          maxLength: 60
+          minLength: 1
+          type: string
+          description: The id of the parent extraction project
+        projectCode:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: The code of the linkage project that this linkage is a part of
+        eventTypeCode:
+          maxLength: 15
+          minLength: 1
+          type: string
+          description: The code of the event type that describes the type of data
+        status:
+          $ref: '#/components/schemas/ExtractionStatus'
+        statusName:
+          type: string
+          description: Name of the current status of the extraction
+          nullable: true
+        createdDateTime:
+          type: string
+          description: The date and time that the extraction was created
+          format: date-time
+      additionalProperties: false
+      description: "An extraction is created by the system when it processes an envelope that is an extraction request.\r\nEach data file within an extraction request envelope will have its own extraction."
+    ExtractionProject:
+      required:
+        - code
+        - description
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: string
+          description: The system generated identifier of the extraction project
+          nullable: true
+        projectId:
+          type: integer
+          description: The ID of the parent linkage project
+          format: int32
+        code:
+          maxLength: 60
+          minLength: 1
+          type: string
+          description: A short alphanumeric code used to identify the extraction project
+        description:
+          maxLength: 200
+          minLength: 1
+          type: string
+          description: A description of the extraction project
+        useEnduringLinkageKeys:
+          type: boolean
+          description: >-
+            A flag indicating if the linkage keys generated should be consistent
+            over time and across the Linkage Project
+      additionalProperties: false
+      description: "All data extractions are done within the context of an extraction project. This context represents a\r\npoint-in-time snapshot of the state of the linkage with a project. In other words, any extractions\r\nthat are performed for a particular extraction project will give the results as they were at the time\r\nthe extraction project was created.\r\nIDs are generated by the system and are of the form LXM[YYYY][MM][NNNN], where [YYYY] is the current year,\r\n[MM] is the current month and [NNNN] is a sequential number.\r\nThe group keys that are returned from an extraction in the results data file are keyed against the\r\nextraction project – this means that the extraction results from one extraction project will only\r\ncorrelate to other results from the same extraction project."
+    ExtractionStatus:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+      type: integer
+      format: int32
+    FieldComparisonType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The internal name of the field comparison type
+          nullable: true
+        displayName:
+          type: string
+          description: A friendly display name for the field comparison type
+          nullable: true
+        helpText:
+          type: string
+          description: >-
+            Some help text that describes how the comparison works and how it
+            can be configured
+          nullable: true
+        properties:
+          type: array
+          items:
+            type: string
+          description: A list of properties supported by the comparison type
+          nullable: true
+      additionalProperties: false
+      description: >-
+        A summary of a comparison type supported by a match provider. For
+        example: JaroWinkler, Bloom, Exact, etc.
+    GroupConfig:
+      type: object
+      properties:
+        groupStrategy:
+          type: string
+          description: The name of the strategy to use for the grouping process
+          nullable: true
+      additionalProperties: false
+      description: "The group configuration defined for a linkage project.\r\nGrouping strategies are add-ins, hence the use of a string, but there are 4 built in strategies\r\navailable:\r\nBinaryFileWeightedBestLinkGroupingStrategy - Weighted Best-Link Grouping(Disk)\r\nInMemoryWeightedBestLinkGroupingStrategy - Weighted Best-Link Grouping(In-Memory)\r\nBinaryFileMergeGroupingStrategy - Merge Grouping(Disk)\r\nInMemoryMergeGroupingStrategy - Merge Grouping(In-Memory)"
+    ImportFormat:
+      required:
+        - columns
+        - columnType
+        - name
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: integer
+          description: The system generated identifier for the import format
+          format: int32
+        name:
+          maxLength: 200
+          minLength: 1
+          type: string
+          description: A friendly name for the import format
+        columnType:
+          $ref: '#/components/schemas/ColumnType'
+        columnTypeName:
+          type: string
+          description: Name of the type of columns in the data
+          nullable: true
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportFormatColumn'
+          description: Definitions for all columns
+      additionalProperties: false
+      description: >-
+        The import format describes the format/layout of the raw datafiles
+        loaded into the system.
+    ImportFormatColumn:
+      required:
+        - linkageField
+        - name
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: integer
+          description: The system generated id for the column
+          format: int32
+        name:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The name of the column
+        linkageField:
+          minLength: 1
+          type: string
+          description: >-
+            The name of the linkage field to map to (leave blank for auxillary
+            fields)
+        index:
+          type: integer
+          description: For delimited columns, the one-based index of the column
+          format: int32
+          nullable: true
+        startPosition:
+          type: integer
+          description: For fixed-width columns, the starting position (one-based)
+          format: int32
+          nullable: true
+        endPosition:
+          type: integer
+          description: For fixed-width columns, the ending position (one-based)
+          format: int32
+          nullable: true
+        format:
+          maxLength: 255
+          type: string
+          description: An optional formatting value (e.g. for dates)
+          nullable: true
+      additionalProperties: false
+      description: The format/metadata for each column in the import format
+    Job:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The system generated id of the job
+          format: int32
+        name:
+          type: string
+          description: A friendly name describing the type of job
+          nullable: true
+        state:
+          type: string
+          description: The current state of the job
+          nullable: true
+        processingStart:
+          type: string
+          description: The date and time the job started
+          format: date-time
+          nullable: true
+        processingFinish:
+          type: string
+          description: The date and time the job finished
+          format: date-time
+          nullable: true
+        projectId:
+          type: integer
+          description: The id of the linkage project this job is associated with
+          format: int32
+          nullable: true
+        projectName:
+          type: string
+          description: The name of the linkage project this job is associated with
+          nullable: true
+        dataProviderId:
+          type: integer
+          description: The id of the data provider this job is associated with
+          format: int32
+          nullable: true
+        dataProviderName:
+          type: string
+          description: The name of the data provider this job is associated with
+          nullable: true
+        eventTypeId:
+          type: integer
+          description: The id of the event type this job is associated with
+          format: int32
+          nullable: true
+        stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobStat'
+          description: A list of all statistics created during job execution
+          nullable: true
+      additionalProperties: false
+      description: A job, run by the system to perform discrete tasks.
+    JobStat:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the statistic
+          nullable: true
+        value:
+          type: string
+          description: The value of the statistic
+          nullable: true
+      additionalProperties: false
+      description: A statistic recorded during job execution.
+    Linkage:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The primary identifier of the linkage, generated by the system
+          format: int32
+        projectCode:
+          type: string
+          description: The code of the project that this linkage is a part of
+          nullable: true
+        name:
+          type: string
+          description: A name to give the linkage, stored as the envelope name
+          nullable: true
+        status:
+          $ref: '#/components/schemas/LinkageStatus'
+        statusName:
+          type: string
+          description: Name of the current status of the linkage
+          nullable: true
+        linkageSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkageSource'
+          description: A list of sources that are used for this particular linkage
+          nullable: true
+        createdDateTime:
+          type: string
+          description: The date and time that the linkage was created
+          format: date-time
+      additionalProperties: false
+    LinkageField:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The internal name of the linkage field
+          nullable: true
+        displayName:
+          type: string
+          description: The modifiable display name given to the linkage field
+          nullable: true
+        maxLength:
+          type: integer
+          description: The maximum length (in characters) for this field
+          format: int32
+        canSpecifyFormat:
+          type: boolean
+          description: A flag indicating if a special format can be applied
+        formatHint:
+          type: string
+          description: Hint on how the field may be formatted
+          nullable: true
+      additionalProperties: false
+      description: Represents a field used for linkage within a linkage project.
+    LinkageSource:
+      type: object
+      properties:
+        eventTypeCode:
+          type: string
+          description: The code of the event type that describes the type of data
+          nullable: true
+        dataSourceCode:
+          type: string
+          description: The code of the data source that is used for the ingestion of data
+          nullable: true
+      additionalProperties: false
+    LinkageStatus:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+      type: integer
+      format: int32
+    LogType:
+      enum:
+        - 0
+        - 1
+        - 2
+      type: integer
+      format: int32
+    MatchConfig:
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        projectId:
+          type: integer
+          description: The id of the parent linkage project
+          format: int32
+        matchProvider:
+          type: string
+          description: The name of the match provider used for the matching job
+          nullable: true
+        logType:
+          $ref: '#/components/schemas/LogType'
+        strategies:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchStrategy'
+          description: A list of strategies to use during the matching process
+          nullable: true
+        weightCurves:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeightCurve'
+          description: >-
+            A list of the weight curves available for use within match
+            strategies
+          nullable: true
+      additionalProperties: false
+      description: Represents the configuration used for matching within a linkage project.
+    MatchProvider:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+      additionalProperties: false
+      description: "Details on a match provider, a library that provides some sort of matching capability. LinXmart has\r\ntwo such providers: BigMatch and CUPLE (the default)."
+    MatchProviderField:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The internal name of the field
+          nullable: true
+        displayName:
+          type: string
+          description: A display name for the field
+          nullable: true
+        linkageFieldName:
+          type: string
+          description: The name of the system linkage field this corresponds to
+          nullable: true
+        availableComparisons:
+          type: array
+          items:
+            type: string
+          description: A list of copmparison types available for this particular field
+          nullable: true
+      additionalProperties: false
+      description: Details on a field supported by a match provider.
+    MatchStrategy:
+      required:
+        - blockingFields
+        - matchingFields
+        - name
+        - order
+        - threshold
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: integer
+          description: The internally assigned identifier for the strategy
+          format: int32
+        name:
+          maxLength: 30
+          minLength: 1
+          type: string
+          description: The name of the strategy
+        order:
+          type: integer
+          description: >-
+            The order in which this strategy should be used in conjunction with
+            other strategies
+          format: int32
+        threshold:
+          type: number
+          description: All matching pair scores below this threshold value are discarded
+          format: double
+        isActive:
+          type: boolean
+          description: A flag indicating if the strategy will be used.
+          nullable: true
+        blockingFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlockingField'
+          description: The list of fields used for creating blocks in this strategy
+        matchingFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchingField'
+          description: The list of fields to match in this strategy
+      additionalProperties: false
+      description: >-
+        A summary of a strategy that can be used as part of the match
+        configuration.
+    MatchingField:
+      required:
+        - comparisonTypeName
+        - matchProviderFieldName
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The system generated identifier for the matching field
+          format: int32
+        matchProviderFieldName:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The name of the field as defined by the match provider
+        comparisonTypeName:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The type of match provider comparison to use
+        comparisonTypeProperties:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property'
+          description: Custom properties specific to the comparison type (if applicable)
+          nullable: true
+        matchProbability:
+          type: number
+          description: >-
+            The likelihood that this field is the same for two records belonging
+            to the same entity
+          format: double
+          nullable: true
+        nonMatchProbability:
+          type: number
+          description: >-
+            The likelihood that this field is the same for two records belonging
+            to different entities
+          format: double
+          nullable: true
+        agreementWeight:
+          type: number
+          description: >-
+            An optional override allowing you to set an explicit agreement
+            weight
+          format: double
+          nullable: true
+        disagreementWeight:
+          type: number
+          description: >-
+            An optional override allowing you to set an explicit disagreement
+            weight
+          format: double
+          nullable: true
+        weightCurveCode:
+          type: string
+          description: The weight curve to apply to the comparisons agreement value
+          nullable: true
+      additionalProperties: false
+      description: The definition of a linkage field used for matching within a strategy
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The internal identifier assigned to the notification
+          format: int32
+        logLevel:
+          type: string
+          description: The severity/impact of the notification
+          nullable: true
+        message:
+          type: string
+          description: The main notification message
+          nullable: true
+        attachmentFilename:
+          type: string
+          description: The name of an attachment, if it exists
+          nullable: true
+        createdOn:
+          type: string
+          description: The date and time the notification was created
+          format: date-time
+      additionalProperties: false
+      description: A notification of an event.
+    Project:
+      required:
+        - code
+        - description
+        - eventTypeMembers
+        - name
+      type: object
+      properties:
+        lastModified:
+          type: string
+          format: date-time
+        version:
+          type: string
+          format: byte
+          nullable: true
+        id:
+          type: integer
+          description: The internal ID of the linkage project
+          format: int32
+        code:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: The unique code used to identify the linkage project
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: A short name to identify the linkage project
+        description:
+          maxLength: 1000
+          minLength: 1
+          type: string
+          description: A description for the linkage project
+        notificationEmail:
+          maxLength: 320
+          type: string
+          description: Email address for notifications related to this particular project
+          nullable: true
+        isActive:
+          type: boolean
+          description: A flag indicating if the linkage project is active and can be used
+        groupConfig:
+          $ref: '#/components/schemas/GroupConfig'
+        eventTypeMembers:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventTypeMember'
+          description: >-
+            A list of event type members that are supported by the linkage
+            project
+        projectLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLink'
+          description: A list of other projects that this linkage project links to
+          nullable: true
+      additionalProperties: false
+      description: "All data and associated linkages in the system are contained within a Project.\r\nThis segregation of data into disparate silos allows multiple linkages to occur a simultaneously.\r\nThe data envelopes that are added to the system must specify a Project to be contained within."
+    ProjectLink:
+      type: object
+      properties:
+        projectId:
+          type: integer
+          description: The ID of the project to link to
+          format: int32
+        eventTypeMembers:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventTypeMember'
+          description: The list of participating event types in the linked project
+          nullable: true
+      additionalProperties: false
+      description: Represents a link to another project.
+    Property:
+      required:
+        - name
+        - value
+      type: object
+      properties:
+        name:
+          minLength: 1
+          type: string
+          description: The name of the property
+        value:
+          minLength: 1
+          type: string
+          description: The value of the property
+      additionalProperties: false
+      description: A name/value property.
+    Result:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The primary identifier of the result generated by the system
+          format: int32
+        extractionId:
+          type: integer
+          description: The ID of the extraction request
+          format: int32
+        name:
+          type: string
+          description: Represents the result's file name if downloaded
+          nullable: true
+        sender:
+          type: string
+          description: The code of the data provider that the data is sourced
+          nullable: true
+        canDownload:
+          type: boolean
+          description: A flag indicating if the result zip file can be downloaded
+      additionalProperties: false
+      description: "A Result represents the output (or result) of an Extraction. Once the Extraction has been completed,\r\na Result resource is created.\r\nThe Result can be downloaded as a ZIP file containing the data requested."
+    WeightCurve:
+      required:
+        - code
+        - decimalScale
+        - name
+        - points
+      type: object
+      properties:
+        weightCurveId:
+          type: integer
+          description: The internal identifier assigned to the weight curve
+          format: int32
+        code:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: A user-defined code for referencing the weight curve
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: A name for the weight curve
+        decimalScale:
+          type: integer
+          description: The granularity of the piecewise linear function
+          format: int32
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeightCurvePoint'
+          description: These points define the piecewise linear function
+      additionalProperties: false
+      description: "The details of of a weight curve that can be applied to an approximate comparison to determine\r\nthe partial weight to apply."
+    WeightCurvePoint:
+      required:
+        - distance
+        - weightProportion
+      type: object
+      properties:
+        distance:
+          type: number
+          description: The distance (or similarity) value between 0 and 1
+          format: double
+        weightProportion:
+          type: number
+          description: >-
+            The proportion of weight to apply (0 = full disagreement, 1 = full
+            agreement)
+          format: double
+      additionalProperties: false
+      description: "This represents a single point within a piecewise linear function for converting an approximate comparison result\r\n(or distance) to a proportion of weight between full disagreement and full agreement."
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The primary identifier of the linkage, generated by the system
+          format: int32
+        projectCode:
+          type: string
+          description: The code of the project that this linkage is a part of
+          nullable: true
+        initiatedOn:
+          type: string
+          description: The date and time the workflow was initiated in the system
+          format: date-time
+          nullable: true
+        processingStart:
+          type: string
+          description: The date and time the workflow started
+          format: date-time
+          nullable: true
+        processingFinish:
+          type: string
+          description: The date and time the workflow completed
+          format: date-time
+          nullable: true
+        status:
+          $ref: '#/components/schemas/WorkflowStatus'
+        statusName:
+          type: string
+          description: The current status name of the workflow in the system
+          nullable: true
+      additionalProperties: false
+    WorkflowStatus:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      type: integer
+      format: int32
